@@ -1,0 +1,11 @@
+import {checkLessonPreparation} from './courseResearch';
+import type {PlanningDraft} from './planningTypes';
+import type {ShortLesson} from './labTypes';
+import {checkAnalysis} from './labEngine';
+export interface CourseOutline {title:string;intro:string;lessons:{title:string;question:string;focus:string}[]}
+export function checkOutline(value:unknown):CourseOutline{const v=value as CourseOutline;const str=(x:unknown,n=500)=>typeof x==='string'&&x.trim().length>0&&x.length<=n;if(!v||!str(v.title,150)||!str(v.intro,350)||!Array.isArray(v.lessons)||v.lessons.length!==3||v.lessons.some(l=>!str(l.title,150)||!str(l.question)||!str(l.focus)))throw new Error('大纲尚未完整，已保留对话，请继续生成');return structuredClone(v)}
+export function missingPlanningBasics(p:PlanningDraft){const missing:string[]=[];if(!p.brief.topic.trim())missing.push('学习主题');if(!p.brief.goal.trim())missing.push('最关心的问题');if(!p.brief.level.trim()||/^(不确定|未知|不知道|待确认)$/.test(p.brief.level.trim()))missing.push('学习基础（也可以明确选择从零开始）');if(!p.brief.preferences.trim())missing.push('讲解和练习偏好');if(!Number.isFinite(p.brief.minutes)||p.brief.minutes<5||p.brief.minutes>180)missing.push('每节学习时长');return missing}
+export const planningReady=(p:PlanningDraft)=>p.requirementsConfirmed===true&&missingPlanningBasics(p).length===0;
+export const wantsGeneration=(text:string)=>!/(不要|先别|暂不|不想|别急)/.test(text)&&/(^开始$|^生成$|开始生成|生成课程|生成大纲|直接生成|先按.{0,20}(写|生成|开始)|按这个.{0,20}(写|生成|开始)|开始备课|你替我选|就按这个|可以开始|开始吧)/.test(text);
+export function teachingAnalysis(p:PlanningDraft,lessons:ShortLesson[]){if(!p.outline||lessons.length!==3||!p.text)throw new Error('请先准备完整单元');return checkAnalysis({summary:p.outline.intro,highlights:[],concepts:[],lessons,expressions:[],report:'选一个身边的现象，结合这一单元的认识写一段小分析。可以等想写的时候再做。'},p.text)}
+export function checkTeachingLesson(value:unknown,p:PlanningDraft,preparation?:unknown):ShortLesson{const v=value as {usable:boolean;reason?:string;lesson?:ShortLesson};if(v?.usable!==true||!v.lesson)throw new Error(v?.reason||'现有来源不足以讲清这节课，尚未标记为准备完成');if(!p.outline||!p.text)throw new Error('请先确认大纲');const lesson=structuredClone(v.lesson);delete lesson.preparation;if(preparation)lesson.preparation=checkLessonPreparation(preparation);const test=[lesson,lesson,lesson];teachingAnalysis(p,test);return lesson}

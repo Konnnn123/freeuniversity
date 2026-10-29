@@ -1,0 +1,16 @@
+import {it,expect,vi} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {MemoryRouter,Routes,Route} from 'react-router-dom';
+import {LanguageStudio} from '../src/LanguageStudio';
+import {StudioWorkspace} from '../src/StudioWorkspace';
+import {Courses} from '../src/Courses';
+import {Museum} from '../src/Museum';
+import {useStore} from '../src/store';
+import {createSeed} from '../src/seed';
+import {upgradeArchive,startSession,updateSession,recordExploration} from '../src/studioEngine';
+vi.mock('../src/store',async importOriginal=>{const original=await importOriginal<typeof import('../src/store')>();return {...original,useStore:Object.assign(()=>original.useStore.getState(),original.useStore)}});
+const render=(url:string,path:string,page:React.ReactNode)=>renderToString(<MemoryRouter initialEntries={[url]}><Routes><Route path={path} element={page}/></Routes></MemoryRouter>);
+it('both studios share Explore, Collection, Notebook, Paths and History',()=>{useStore.setState({data:upgradeArchive(createSeed()),ready:true});for(const language of ['ja','en']){const html=render('/studio/'+language,'/studio/:language',<LanguageStudio/>);for(const title of ['Explore','Collection','Notebook','Paths','History','导入 URL / 文本 / 图片'])expect(html).toContain(title)}});
+it('old Japanese course editor and structural lessons remain reachable through Paths',()=>{useStore.setState({data:upgradeArchive(createSeed()),ready:true});expect(render('/courses/course-0/paths','/courses/:id/paths',<Courses paths/>)).toContain('真实对话理解');expect(render('/studio/ja?tab=Paths','/studio/:language',<LanguageStudio/>)).toContain('/courses/course-0/paths')});
+it('resumable reader renders original writing, saved annotation and notes',()=>{const d=upgradeArchive(createSeed()),id=startSession(d,'studio-original-ja');updateSession(d,id,{paragraph:1,notes:'我自己的日语笔记'});d.studio!.annotations.push({id:'mark',language:'ja',resourceId:'studio-original-ja',sessionId:id,quote:d.studio!.media[0].text.slice(0,3),note:'喜欢这句',paragraph:0,startOffset:0,timestamp:'',createdAt:''});useStore.setState({data:d,ready:true});const html=render('/studio/ja/media/studio-original-ja','/studio/:language/media/:mediaId',<StudioWorkspace/>);expect(html).toContain('我自己的日语笔记');expect(html).toContain('<mark');expect(html).toContain('没有必做步骤');expect(html).toContain('已记住这里')});
+it('topic schedules show the culture card and exploration log is in museum',()=>{const d=upgradeArchive(createSeed());d.studio!.topics.push({id:'topic1',language:'ja',title:'雨声与叙述',body:'自己的观察',evidence:'原创文本',resourceIds:['studio-original-ja']});const id=startSession(d,'studio-original-ja');recordExploration(d,id,0,'没有练习也能保存');useStore.setState({data:d,ready:true});expect(render('/studio/ja?tab=Notebook&topic=topic1','/studio/:language',<LanguageStudio/>)).toContain('雨声与叙述');expect(render('/museum','/museum',<Museum/>)).toContain('没有练习也能保存')});

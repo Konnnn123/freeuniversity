@@ -1,0 +1,26 @@
+import type {ShortLesson} from './labTypes';
+export interface LessonIssue {field:string;reason:string}
+const names:Record<string,string>={summary:'材料简介',report:'分析任务',highlights:'重点',concepts:'概念',expressions:'原文表达',lessons:'课时',term:'概念名称',essence:'概念解释',analogy:'类比',notYet:'待解决的问题',original:'原句',meaning:'含义',context:'上下文',text:'文字',paragraph:'原文段落',title:'课时标题',question:'学习问题',explanation:'讲解正文',example:'生活情境',boundary:'适用条件',paragraphs:'原文输入范围',quiz:'情境练习',prompt:'题目',options:'选项',correct:'正确答案编号',feedback:'选项反馈',usable:'备课内容'};
+export function lessonIssueText(issue:LessonIssue){return issue.field.replace(/[A-Za-z]+/g,key=>names[key]||key).replace(/\[(\d+)\]/g,(_,n)=>'第'+(Number(n)+1)+'项').replaceAll('.','·')+'：'+issue.reason}
+export class LessonContractError extends Error {code='pdf_lesson_validation';issues:LessonIssue[];constructor(issues:LessonIssue[]){super(issues.slice(0,5).map(lessonIssueText).join('；'));this.name='LessonContractError';this.issues=issues}}
+export const sourceParagraphs=(text:string)=>text.replace(/\r\n/g,'\n').split(/\n\s*\n|\n/).map(x=>x.trim()).filter(Boolean);
+export function checkLessonContent(input:unknown,text:string,profile:'standard'|'pdf'='standard'):ShortLesson{
+ const l=input as ShortLesson,issues:LessonIssue[]=[],pdf=profile==='pdf',n=sourceParagraphs(text).length;const issue=(field:string,reason:string)=>issues.push({field,reason});
+ const string=(v:unknown,field:string,max:number)=>{if(typeof v!=='string'||!v.trim())issue(field,'缺少完整文字');else if(v.length>max)issue(field,`共${v.length}字符，超过本字段的${max}字符上限`)};
+ const refs=(v:unknown,field:string)=>{if(!Array.isArray(v)||!v.length||v.some(i=>!Number.isInteger(i)||i<1||i>n))issue(field,`编号应在实际输入的1–${n}段之内`)};
+ if(!l||typeof l!=='object'||Array.isArray(l))throw new LessonContractError([{field:'usable',reason:'没有收到有效课时对象'}]);
+ for(const [field,max]of Object.entries(pdf?{title:300,question:1500,explanation:16000,example:8000,boundary:4000}:{title:1800,question:1800,explanation:1800,example:1800,boundary:1800}))string(l[field as keyof ShortLesson],field,max);refs(l.paragraphs,'paragraphs');
+ if(!Array.isArray(l.quiz)||l.quiz.length<1||l.quiz.length>(pdf?6:3))issue('quiz',`需要1–${pdf?6:3}道完整情境题`);else l.quiz.forEach((q,i)=>{const path='quiz['+i+']';if(!q||typeof q!=='object'){issue(path,'缺少完整题目');return}string(q.prompt,path+'.prompt',pdf?1800:700);const min=pdf?2:3,max=pdf?6:4;if(!Array.isArray(q.options)||q.options.length<min||q.options.length>max)issue(path+'.options',`需要${min}–${max}个文字选项`);else q.options.forEach((o,j)=>string(o,path+'.options['+j+']',pdf?1500:350));if(!Number.isInteger(q.correct)||q.correct<0||q.correct>=(q.options?.length||0))issue(path+'.correct','应为从0开始、且不超出选项范围的整数');if(!Array.isArray(q.feedback)||q.feedback.length!==q.options?.length)issue(path+'.feedback','每个选项都需要一条对应反馈，数量必须一致');else q.feedback.forEach((f,j)=>string(f,path+'.feedback['+j+']',pdf?3000:700));refs(q.paragraphs,path+'.paragraphs')});
+ if(issues.length)throw new LessonContractError(issues);return structuredClone(l);
+}
+export function generatedPdfLesson(value:unknown,text:string,outline:{title:string;question:string}):ShortLesson{
+ const v=value as {usable?:boolean;reason?:string;lesson?:ShortLesson};if(v?.usable===false)throw new LessonContractError([{field:'usable',reason:typeof v.reason==='string'?v.reason.slice(0,500):'本课尚未生成完整讲解，已完成的小课保留'}]);
+ const candidate=v?.lesson||value as ShortLesson;if(!candidate||typeof candidate!=='object'||Array.isArray(candidate))throw new LessonContractError([{field:'usable',reason:'本课尚未生成完整讲解，已完成的小课保留'}]);const l=structuredClone(candidate);delete l.preparation;
+ if(typeof l.title!=='string'||!l.title.trim())l.title=outline.title;if(typeof l.question!=='string'||!l.question.trim())l.question=outline.question;
+ // These indices describe the actual input scope, not model-claimed pinpoint citations.
+ const refs=sourceParagraphs(text).map((_,i)=>i+1);l.paragraphs=refs;if(l.quiz&&typeof l.quiz==='object'&&!Array.isArray(l.quiz))l.quiz=[l.quiz];if(Array.isArray(l.quiz))l.quiz=l.quiz.map(q=>{if(!q||typeof q!=='object')return q;const correct=typeof q.correct==='string'&&/^\d+$/.test(q.correct)?Number(q.correct):q.correct;return {...q,correct,paragraphs:refs}});
+ return checkLessonContent(l,text,'pdf');
+}
+export function repairFields(issues:LessonIssue[]){return [...new Set(issues.map(i=>i.field.split(/[.[]/)[0]))].filter(k=>['title','question','explanation','example','boundary','quiz'].includes(k))}
+export function retainedLessonBody(value:unknown,field='explanation'){const v=value as {lesson?:Record<string,unknown>}|undefined,body=v?.lesson||value as Record<string,unknown>;return body&&typeof body==='object'&&typeof body[field]==='string'?String(body[field]):''}
+export function mergeLessonRepair(value:unknown,patch:unknown,fields:string[]){const p=patch as {fields?:Record<string,unknown>},v=value as {lesson?:Record<string,unknown>};if(!p?.fields||typeof p.fields!=='object'||Array.isArray(p.fields)||!Object.keys(p.fields).length||Object.keys(p.fields).some(k=>!fields.includes(k)))throw new LessonContractError([{field:'usable',reason:'补修结果包含未请求修改的字段，原正文保留'}]);return {usable:true,lesson:{...(v?.lesson||value as object),...structuredClone(p.fields)}}}

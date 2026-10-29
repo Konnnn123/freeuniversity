@@ -1,0 +1,53 @@
+.handbook-button{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 12px;background:#edf0de;border-color:#9baa8c;font-size:.8rem}
+.handbook-dialog .modal-shade{z-index:2200;padding:10px}
+.handbook-dialog .modal{width:min(1040px,calc(100vw - 32px));max-width:1040px;padding:0;max-height:calc(100dvh - 40px);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.handbook-dialog .modal>header{margin:0;padding:14px 20px;flex-shrink:0;background:#fff7e7;border-bottom:1px solid #c5b8bd}
+.handbook-dialog .modal>header h2{font-size:1rem;margin:0}
+.handbook-dialog .modal>header button{display:grid;place-items:center;padding:5px}
+.handbook-book{display:grid;grid-template-columns:240px minmax(0,1fr);height:min(700px,calc(100dvh - 110px));min-height:0;isolation:isolate}
+.handbook-contents{min-height:0;display:flex;flex-direction:column;background:#e6ebd5;padding:20px 16px 12px;border-right:1px solid #a7aa95;box-shadow:inset -8px 0 0 #dce2cc;position:relative}
+.handbook-cover{text-align:center;flex-shrink:0;padding-bottom:12px}
+.handbook-cover-label{font:9px monospace;letter-spacing:2px;color:#7f8871}
+.handbook-art{display:block;width:160px;max-width:100%;height:98px;margin:6px auto 0;image-rendering:pixelated}
+.handbook-cover h2{font-size:1.18rem;margin:0 0 7px;color:#5c6255}
+.handbook-cover p{font-size:.76rem;line-height:1.8;margin:0;color:#797d70}
+.handbook-contents nav{display:flex;flex-direction:column;gap:3px;overflow:auto;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b5b9a7 transparent;padding:2px 5px 5px 0}
+.handbook-contents nav button{display:flex;align-items:center;gap:8px;padding:9px 10px;text-align:left;background:transparent;box-shadow:none;border:1px solid transparent;font-size:.81rem;min-height:37px;flex-shrink:0;transition:none}
+.handbook-contents nav button>span:first-child{font:10px monospace;color:#8a8f80;min-width:17px}
+.handbook-contents nav button.current{background:#fff7e7;border-color:#aaa38e;box-shadow:2px 2px 0 #c5c8b5;font-weight:bold}
+.handbook-contents nav button:hover{background:#f6f4e5;transform:none}
+.handbook-tab-arrow{margin-left:auto;color:#99a084;visibility:hidden}
+.handbook-contents nav .current .handbook-tab-arrow{visibility:visible}
+.handbook-cover-foot{font-size:.65rem;color:#8b927d;letter-spacing:1px;text-align:center;padding-top:10px;flex-shrink:0}
+.handbook-sheet{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;background:#fff9ed;box-shadow:inset 8px 0 12px -10px #8d8071}
+.handbook-sheet:after{content:'';position:absolute;right:10px;top:0;width:16px;height:37px;background:#cbb3ce;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%);pointer-events:none}
+.handbook-page-scroll{overflow:auto;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c9bda6 transparent;padding:20px 34px 24px}
+.handbook-sheet-top{display:flex;justify-content:space-between;align-items:center;padding-right:16px;color:#a195a1;font:9px monospace;letter-spacing:1.5px;margin-bottom:20px}
+.handbook-sheet-top>span:last-child{color:#c4ad78;font-size:15px}
+.handbook-chapter-icon{display:grid;place-items:center;width:48px;height:48px;color:#788767;background:#e6ecd8;border:1px solid #a8b195;box-shadow:3px 3px 0 #d4d9c6;margin-bottom:16px}
+.handbook-kicker{font:9px monospace;letter-spacing:1.7px;color:#99908d;margin:0 0 8px;line-height:1.6}
+.handbook-sheet h2{font-size:1.55rem;line-height:1.5;color:#5e526e;margin:0 0 12px;outline:none}
+.handbook-intro{font-size:.9rem;line-height:1.9;color:#82768a;margin:0 0 23px;max-width:48em}
+.handbook-steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:19px}
+.handbook-steps li{display:grid;grid-template-columns:27px minmax(0,1fr);gap:13px}
+.handbook-step-number{font:11px monospace;align-self:start;border-bottom:2px solid #c7ceb5;color:#91a27b;padding:5px 0 7px;text-align:center}
+.handbook-steps h3,.handbook-note h3{font-size:.95rem;margin:0 0 5px;line-height:1.6}
+.handbook-steps p,.handbook-note p{font-size:.86rem;line-height:1.95;margin:0;overflow-wrap:anywhere}
+.handbook-note{display:flex;gap:10px;background:#f1eddc;border-left:3px solid #b9c8a1;padding:13px 15px;margin:24px 0 18px}
+.handbook-note>svg{flex-shrink:0;color:#8e9b78;margin-top:4px}
+.handbook-note h3{font-size:.83rem;color:#798568}
+.handbook-note p{font-size:.8rem;color:#847c86}
+.handbook-destinations{display:flex;flex-wrap:wrap;gap:10px}
+.handbook-destinations .button{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;font-size:.82rem;padding:10px 14px;min-height:39px;line-height:1.5}
+.handbook-pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 28px;padding:13px 0 15px;border-top:1px dashed #d6cbd0;flex-shrink:0}
+.handbook-pagination button{font-size:.76rem;padding:7px 10px;min-height:34px;white-space:nowrap;background:#fbf1dd}
+.handbook-pagination>span{font:10px monospace;letter-spacing:2px;color:#a79baa;white-space:nowrap}
+.handbook-pagination>span b{font-size:15px;color:#6d6178;font-weight:normal}
+.handbook-page{max-width:1180px;margin:auto}
+.handbook-page-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+.handbook-page-header h1{font-size:1.6rem;margin:8px 0 0}
+.handbook-page .handbook-book{border:2px solid #a598a2;box-shadow:4px 4px 0 #d4c7ae;height:min(760px,calc(100dvh - 270px));min-height:440px}
+.handbook-button:focus-visible,.handbook-book button:focus-visible,.handbook-book a:focus-visible{outline:3px solid #8d9f78;outline-offset:2px}
+@media(max-width:1250px){.topbar-middle{display:none}}
+@media(max-width:760px){.handbook-dialog .modal{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}.handbook-book{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);height:calc(100dvh - 90px)}.handbook-contents{padding:9px 12px 8px;border-right:0;border-bottom:1px solid #afb19d;box-shadow:inset 0 -3px 0 #dce2cc}.handbook-cover,.handbook-cover-foot{display:none}.handbook-contents nav{flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:2px 2px 7px;gap:7px}.handbook-contents nav button{white-space:nowrap;min-height:36px;padding:7px 9px}.handbook-contents nav button>svg,.handbook-tab-arrow{display:none}.handbook-page-scroll{padding:17px 22px 22px}.handbook-sheet-top{margin-bottom:13px}.handbook-chapter-icon{width:40px;height:40px;margin-bottom:13px}.handbook-sheet h2{font-size:1.35rem}.handbook-intro{margin-bottom:18px}.handbook-steps{gap:16px}.handbook-steps li{grid-template-columns:23px minmax(0,1fr);gap:10px}.handbook-pagination{margin:0 20px}.handbook-dialog .modal>header{padding:11px 15px}.handbook-page .handbook-book{height:calc(100dvh - 240px);min-height:430px}.handbook-page-header h1{font-size:1.25rem}.handbook-page-header .button{font-size:.75rem;white-space:nowrap}.handbook-button{padding:7px 9px;font-size:.75rem;gap:5px}.topbar-right{gap:7px}.topbar .date{display:none}}
+@media(max-width:440px){.topbar{padding:0 9px;gap:5px}.topbar .brand{gap:5px}.topbar .brand b{font-size:1.05rem;letter-spacing:1px}.topbar .brand-mark{width:29px;height:29px}.topbar .brand-mark svg{width:23px;height:23px}.topbar .brand small{font-size:.4rem}.handbook-button{padding:6px 7px;gap:4px}.handbook-button svg{display:none}.topbar .global-ai-button{padding:6px;font-size:.65rem}.topbar-right{gap:5px}.topbar .icon-button{padding:4px}.handbook-sheet h2{font-size:1.18rem}.handbook-page-scroll{padding-left:17px;padding-right:17px}.handbook-kicker{font-size:8px;letter-spacing:1px}.handbook-destinations .button{gap:9px;padding:8px 10px}.handbook-pagination{margin:0 15px}.handbook-page-header{align-items:flex-start}}

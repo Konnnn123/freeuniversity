@@ -1,0 +1,13 @@
+import {it,expect,vi} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {MemoryRouter,Route,Routes} from 'react-router-dom';
+import {MaterialLab,MaterialClassroom} from '../src/MaterialLab';
+import {useStore} from '../src/store';
+import {upgradeArchive} from '../src/studioEngine';
+import {createSeed} from '../src/seed';
+import {addMaterial,courseFromMaterial} from '../src/labEngine';
+import {sampleAnalysis,sampleText} from '../src/labSample';
+vi.mock('../src/store',async importOriginal=>{const original=await importOriginal<typeof import('../src/store')>();return {...original,useStore:Object.assign(()=>original.useStore.getState(),original.useStore)}});
+const render=(url:string,path:string,page:React.ReactNode)=>renderToString(<MemoryRouter initialEntries={[url]}><Routes><Route path={path} element={page}/></Routes></MemoryRouter>);
+it('material lobby offers a labeled original demo, local-only import and learning preferences',()=>{useStore.setState({data:upgradeArchive(createSeed()),ready:true});const html=render('/materials','/materials',<MaterialLab/>);for(const text of ['原创样例','AI 连接','原文','生活例子偏好','这一步只保存到本机'])expect(html).toContain(text)});
+it('sample desk renders summary with traceable concepts and classroom keeps source route',()=>{const d=upgradeArchive(createSeed());const id=addMaterial(d,{title:'样例',text:sampleText,url:'',goal:'理解',exampleDomain:'生活'});d.readingLab!.materials[0].analysis=structuredClone(sampleAnalysis);d.readingLab!.materials[0].provenance='原创演示';const course=courseFromMaterial(d,id);useStore.setState({data:d,ready:true});const html=render('/materials/'+id,'/materials/:id',<MaterialLab/>);for(const text of ['原创演示','三节短课','依据原文','诱导需求','语言表达'])expect(html).toContain(text);const l=d.lessons!.find(l=>l.courseId===course)!;const room=render('/lessons/'+l.id,'/lessons/:id',<MaterialClassroom lesson={l}/>);expect(room).toContain('本课学习进度');expect(room).toContain('本课标注');expect(room).not.toContain('aria-label="短课笔记"');expect(room).toContain('/materials/'+id)});

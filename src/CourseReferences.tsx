@@ -1,0 +1,5 @@
+import {Link} from 'react-router-dom';
+import {useStore} from './store';
+import {ResourceCards} from './Library';
+import {referenceLesson} from './courseOrganization';
+export function CourseReferences({courseId}:{courseId:string}){const {data}=useStore(),course=data.courses.find(c=>c.id===courseId)!,rows=(data.lessons||[]).filter(l=>l.courseId===courseId&&referenceLesson(l));return <div className="course-references"><section className="pixel-panel section-pad"><h2>原书与参考资料</h2><p>课堂负责讲解与练习；这里保留原书、章节分析、概念卡和以前的学习记录，需要时再展开。</p>{course.bookId&&<Link className="button" to={'/books/'+encodeURIComponent(course.bookId)+'?reference=1'}>打开原PDF与完整章节分析 →</Link>}{rows.length>0&&<details><summary>已保存的章节分析与旧版课堂（{rows.length}）</summary><div className="reference-lesson-list">{rows.map(l=><Link key={l.id} to={'/lessons/'+l.id}>{l.title}{l.archivedFromClassroom?' · 旧版课堂':' · 章节分析'} →</Link>)}</div></details>}</section><details className="course-resource-fold"><summary>其他参考资源与来源</summary><ResourceCards courseId={courseId}/></details></div>}

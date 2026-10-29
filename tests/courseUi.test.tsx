@@ -1,0 +1,10 @@
+import {it,expect} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {filterCourses,subjectFor} from '../src/courseManagement';
+import {createSeed} from '../src/seed';
+import {CourseCardMenu,SubjectField} from '../src/CourseCardMenu';
+import {KeyConfig} from '../src/MaterialLab';
+it('filters legacy, edited and custom course categories together with search text',()=>{const courses=createSeed().courses;const pdf={...courses[0],id:'pdf',code:'PDF 101',name:'劳动法资料',kind:'理论' as const,subject:'社会与公共生活'};courses.push(pdf,{...pdf,id:'custom',subject:'心理与认知'});expect(filterCourses(courses,'社会与公共生活','劳动法').map(c=>c.id)).toEqual(['pdf']);expect(filterCourses(courses,'心理与认知','')).toHaveLength(1);expect(filterCourses(courses,'语言与文化','')).toHaveLength(3);expect(subjectFor({...pdf,subject:' 社会与公共生活 '})).toBe('社会与公共生活')});
+it('category editing uses an actual select including the current custom category',()=>{const html=renderToString(<SubjectField value="心理与认知"/>);expect(html).toContain('<select name="subject"');expect(html).toContain('selected=""');expect(html).toContain('自定义分类');expect(html).not.toContain('<datalist')});
+it('course card actions start hidden and provide a touch and keyboard accessible menu trigger',()=>{const html=renderToString(<CourseCardMenu name="测试课程" onEdit={()=>{}} onDelete={()=>{}}><button>打开课程</button></CourseCardMenu>);expect(html).toContain('aria-haspopup="menu"');expect(html).toContain('aria-expanded="false"');expect(html).not.toContain('编辑档案 / 分类');expect(html).not.toContain('删除课程')});
+it('AI settings describe their real shared scope rather than a library-only connection',()=>{const html=renderToString(<KeyConfig onClose={()=>{}}/>);expect(html).toContain('全站 AI 设置');expect(html).toContain('对话开课');expect(html).toContain('共用此配置')});

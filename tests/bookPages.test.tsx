@@ -1,0 +1,10 @@
+import {it,expect} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {MemoryRouter,Routes,Route} from 'react-router-dom';
+import {PdfImporter} from '../src/PdfImporter';
+import {Books} from '../src/Books';
+import {MaterialFeedback} from '../src/MaterialFeedback';
+import {sampleAnalysis,sampleText} from '../src/labSample';
+it('whole book shelf exposes backup restore and a direct import route',()=>{const html=renderToString(<MemoryRouter initialEntries={['/books']}><Routes><Route path="/books" element={<Books/>}/></Routes></MemoryRouter>);expect(html).toContain('整本放好');expect(html).toContain('恢复目录与索引');expect(html).toContain('/materials')});
+it('report feedback screen prioritizes evidence and actual source dates',()=>{const html=renderToString(<MemoryRouter><MaterialFeedback material={{id:'m',title:'教材',text:sampleText,url:'',createdAt:'',goal:'理解',exampleDomain:'生活',notes:'',resourceId:'r',analysis:sampleAnalysis}} onConnect={()=>{}}/></MemoryRouter>);expect(html).toContain('提交给 AI 分析证据与推理');expect(html).toContain('新闻');expect(html).toContain('现行效力');expect(html).toContain('我的分析报告');expect(html).not.toContain('想动一下手')});
+it('PDF importer explains local handling while opening document',()=>{const html=renderToString(<MemoryRouter><PdfImporter file={new File(['%PDF-1.4'],'test.pdf')} onClose={()=>{}} onImport={()=>{}} onBookSaved={()=>{}}/></MemoryRouter>);expect(html).toContain('不上传 PDF');expect(html).toContain('正在打开 PDF')});

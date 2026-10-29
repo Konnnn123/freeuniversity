@@ -1,0 +1,7 @@
+import {it,expect} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {TocTree,ChapterResultView} from '../src/Books';
+import type {PdfStructure} from '../src/pdfStructure';
+const structure:PdfStructure={version:1,readAt:'',pageLabels:null,nodes:[{id:'chapter',title:'第三章 争议处理',depth:0,parentId:null,start:33,end:90,samePage:true,rangeSource:'destination',pageLabel:'27'},{id:'section',title:'3.1 处理程序',depth:1,parentId:'chapter',start:33,end:50,samePage:true,rangeSource:'destination'},{id:'bad',title:'无法跳转',depth:0,parentId:null,start:null,end:null,samePage:false,rangeSource:'unresolved'}]};
+it('renders the real hierarchy and separates physical from printed page numbers',()=>{const html=renderToString(<TocTree structure={structure} parentId={null} disabled={false} onRead={()=>{}} onPrepare={()=>{}} onChoose={()=>{}}/>);for(const text of ['第三章','3.1 处理程序','PDF 33–90 页','书内页码 27','页码未解析','disabled'])expect(html).toContain(text);expect(html).not.toContain('AI 已归纳')});
+it('uses actual bookmark titles to present chapter and section learning outlines',()=>{const html=renderToString(<ChapterResultView structure={structure} disabled={false} onRead={()=>{}} onPrepare={()=>{}} result={{nodeId:'chapter',summary:'先理解本章整体关系',concepts:[{term:'条件',explanation:'具体判断条件'}],sections:[{nodeId:'section',question:'怎样选择？',summary:'本节先区分不同情境'}],connections:['知识相联系'],missingEvidence:['需检查新规定']}}/>);for(const text of ['本章主线','3.1 处理程序','小节问题与学习大纲','需检查新规定'])expect(html).toContain(text)});

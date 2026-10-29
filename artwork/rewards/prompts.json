@@ -1,0 +1,152 @@
+{
+  "tool": "Built-in image_gen",
+  "transparent_background": true,
+  "purpose": "36 fixed collectible sprites for Free University",
+  "style": "Crisp 32-bit pixel sprites, three-quarter isometric 2:1 campus perspective, warm cream / muted sage / dusty lavender / honey wood, upper-left light, centered isolated complete object, transparent background; no scene, people, text or watermark.",
+  "subjects": [
+    {
+      "id": "study-desk",
+      "subject": "a small honey-colored wooden study desk, one drawer, four sturdy legs, with a tiny sage-green closed notebook resting on it"
+    },
+    {
+      "id": "wooden-chair",
+      "subject": "a simple honey-colored wooden chair with a lavender seat cushion, clear chair back and four legs"
+    },
+    {
+      "id": "bookshelf",
+      "subject": "a compact two-shelf honey-colored wooden bookcase, books in muted lavender, sage, dusty rose and cream"
+    },
+    {
+      "id": "blackboard",
+      "subject": "a small freestanding school chalkboard in dark muted sage green with a honey wood frame and two legs, a few simple chalk strokes that are not readable writing"
+    },
+    {
+      "id": "desk-lamp",
+      "subject": "a petite sage-green desk lamp with an articulated arm and warm cream lampshade"
+    },
+    {
+      "id": "globe",
+      "subject": "a small antique classroom globe with muted sage continents, dusty-blue oceans and a honey wood stand"
+    },
+    {
+      "id": "potted-plant",
+      "subject": "a leafy little houseplant with three rounded sage leaves in a dusty lavender ceramic pot"
+    },
+    {
+      "id": "cactus",
+      "subject": "a small branching cactus in a terracotta pot, one pale pink blossom"
+    },
+    {
+      "id": "sunflower",
+      "subject": "one cheerful sunflower with muted golden petals in a small cream planter"
+    },
+    {
+      "id": "cherry-tree",
+      "subject": "a small ornamental cherry tree with a soft dusty-pink pixel canopy, honey-brown trunk and minimal roots, no ground tile"
+    },
+    {
+      "id": "pine-tree",
+      "subject": "a compact tiered evergreen pine tree, muted sage and forest green, visible brown trunk, no ground tile"
+    },
+    {
+      "id": "flower-bed",
+      "subject": "a low honey wood rectangular planter filled with a few dusty-pink, lavender and cream flowers"
+    },
+    {
+      "id": "garden-bench",
+      "subject": "a small honey-colored wooden park bench with muted sage iron legs"
+    },
+    {
+      "id": "street-lamp",
+      "subject": "a quaint short campus street lamp with a dark muted lavender metal pole and warm cream lantern"
+    },
+    {
+      "id": "signpost",
+      "subject": "a small wooden campus signpost with two blank directional wooden arrows and a sturdy post, no writing"
+    },
+    {
+      "id": "mailbox",
+      "subject": "a freestanding vintage mailbox on a wooden post, rounded dusty-rose metal box with a tiny sage flag, no text"
+    },
+    {
+      "id": "drinking-fountain",
+      "subject": "a small public drinking water fountain with a muted sage pedestal, cream basin and silver tap"
+    },
+    {
+      "id": "fountain",
+      "subject": "a tiny two-tier ornamental stone fountain, warm cream stone and a few pale dusty-blue water pixels, no surrounding ground tile"
+    },
+    {
+      "id": "easel",
+      "subject": "a small wooden painter easel holding a cream canvas with a simple sage and dusty-lavender abstract landscape"
+    },
+    {
+      "id": "paint-palette",
+      "subject": "a small oval honey wood painter palette with five paint dabs in sage, lavender, dusty rose, cream and muted golden yellow, one small brush resting across it"
+    },
+    {
+      "id": "camera",
+      "subject": "a small vintage film camera with a dusty lavender body, dark plum lens and honey wood colored grip"
+    },
+    {
+      "id": "guitar",
+      "subject": "a small acoustic guitar resting upright on a simple stand, honey wood body, dark plum strings and fretboard"
+    },
+    {
+      "id": "record-player",
+      "subject": "a compact vintage record player with a honey wood base, dusty lavender open lid, dark plum record and sage tonearm"
+    },
+    {
+      "id": "telescope",
+      "subject": "a small sage-green astronomical telescope on a three-legged honey wood tripod"
+    },
+    {
+      "id": "balance-scale",
+      "subject": "a small antique balance scale with muted brass arms, two empty cream pans and a honey wood base"
+    },
+    {
+      "id": "abacus",
+      "subject": "a traditional small honey wood abacus with muted sage and dusty-rose beads"
+    },
+    {
+      "id": "scroll",
+      "subject": "a cream paper scroll partly unrolled with honey wood rollers and a small dusty lavender ribbon, no text"
+    },
+    {
+      "id": "hourglass",
+      "subject": "a small honey wood framed hourglass with pale transparent blue glass and muted golden sand"
+    },
+    {
+      "id": "microscope",
+      "subject": "a compact vintage classroom microscope in muted sage with dark plum eyepiece and cream stage"
+    },
+    {
+      "id": "fossil",
+      "subject": "a small warm cream stone slab displaying a clearly readable spiral ammonite fossil in muted honey-brown"
+    },
+    {
+      "id": "rug",
+      "subject": "a small rectangular woven campus rug laid flat in isometric view, muted lavender and cream geometric checker pattern with sage trim"
+    },
+    {
+      "id": "wall-clock",
+      "subject": "a small round cream-faced wooden wall clock displayed upright as a collectible prop, two clear dark plum hands, simple hour tick marks without numerals"
+    },
+    {
+      "id": "teacup",
+      "subject": "a warm cream ceramic teacup on a saucer, tiny sage leaf motif, a few square steam pixels"
+    },
+    {
+      "id": "curtains",
+      "subject": "a single decorative pair of dusty lavender curtains tied back on a honey wood curtain rod around a small empty rectangular open frame, no wall or room"
+    },
+    {
+      "id": "cat-figurine",
+      "subject": "a small sitting cream-colored ceramic cat figurine with a tiny sage collar and friendly minimal dark plum face"
+    },
+    {
+      "id": "pennant",
+      "subject": "a small freestanding wooden pole with one soft lavender triangular campus pennant and a tiny simple cream star emblem, weighted honey wood base, no writing"
+    }
+  ]
+}
