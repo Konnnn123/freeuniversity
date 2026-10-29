@@ -1,0 +1,44 @@
+.chapter-timetable .timetable-layout{grid-template-columns:270px minmax(0,1fr);align-items:start;gap:18px}
+.chapter-task-pool{display:flex;flex-direction:column;min-width:0;max-height:calc(100dvh - 290px);padding:14px;position:sticky;top:16px;overflow:hidden}
+.chapter-task-pool .panel-label{flex-shrink:0;margin-bottom:10px;font-size:.9rem}
+.pool-course-filter{margin:0;flex-shrink:0;font-size:.72rem}
+.chapter-task-pool .pool-course-filter select{margin-top:6px;font-size:.78rem;padding:8px;width:100%}
+.pool-guide{font-size:.68rem;color:#94869a;line-height:1.8;margin:9px 0 12px;flex-shrink:0}
+.chapter-pool-scroll{min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b7a9b9 #f4eddd;padding:1px 5px 5px 1px;display:flex;flex-direction:column;gap:8px}
+.pool-course{border:1px solid #cec0c8;background:#fbf4e5;flex-shrink:0;min-width:0}
+.pool-course.is-open{border-color:#a9b494}
+.pool-course-toggle,.pool-chapter-toggle{display:flex;align-items:flex-start;gap:7px;width:100%;border:0;box-shadow:none;text-align:left;background:transparent;padding:11px 9px;transition:none;min-width:0}
+.pool-course-toggle:hover,.pool-chapter-toggle:hover{transform:none;background:#f2eedf}
+.pool-course.is-open>.pool-course-toggle{background:#e6ecd7}
+.pool-course-toggle>span:first-child,.pool-chapter-toggle>span:first-child{font-size:.75rem;color:#8d997a;padding-top:2px;flex-shrink:0}
+.pool-course-toggle>span:last-child,.pool-chapter-toggle>span:last-child{display:flex;flex-direction:column;gap:5px;min-width:0}
+.pool-course-toggle b{font-size:.83rem;line-height:1.65;overflow-wrap:anywhere}
+.pool-course-toggle small,.pool-chapter-toggle small{font-size:.62rem;line-height:1.7;color:#938698}
+.pool-chapters{padding:6px 7px 8px}
+.pool-chapter{border-bottom:1px dashed #d8ccd0}
+.pool-chapter-toggle{padding:10px 2px;gap:6px}
+.pool-chapter-toggle b{font-size:.74rem;font-weight:500;line-height:1.7;overflow-wrap:anywhere}
+.pool-chapter-toggle[aria-expanded=true] b{font-weight:bold;color:#73835e}
+.pool-chapter-content{padding:0 1px 9px 10px}
+.pool-lesson{border:1px solid #d2c5c9;border-left:3px solid #b9c6a1;background:#fff9ec;margin:0 0 8px;padding:9px;box-shadow:1px 1px 0 #e4d9c6;cursor:grab;min-width:0}
+.pool-lesson:active{cursor:grabbing}
+.pool-lesson>b{font-size:.73rem;line-height:1.7;display:block;overflow-wrap:anywhere}
+.pool-lesson>small{display:block;font-size:.62rem;line-height:1.7;color:#998d9b;margin:5px 0}
+.pool-lesson .task-actions{display:flex;gap:7px;flex-wrap:wrap}
+.pool-lesson .task-actions button,.pool-lesson .task-actions .button{font-size:.62rem;padding:4px 7px;line-height:1.6;background:#fcf2da;white-space:nowrap}
+.pool-lesson.is-unprepared{background:#f5f0e6;border-left-color:#cec3bb;box-shadow:none;cursor:default;color:#9c929e}
+.pool-lesson.is-review{border-left-color:#c8bbd4}
+.pool-lesson .text-button{font-size:.64rem}
+.pool-show-more{border:0;box-shadow:none;font-size:.65rem;background:transparent;color:#8b7c96;padding:5px 0 10px;text-align:left;line-height:1.7;white-space:normal}
+.pool-secondary{margin:5px 0 0;padding:6px 0;border-top:1px dotted #d8ccd0}
+.pool-secondary>summary{font-size:.66rem;line-height:1.8;color:#918497;cursor:pointer}
+.pool-secondary[open]>summary{margin-bottom:7px}
+.pool-empty{font-size:.68rem;line-height:1.9;color:#a095a0;margin:7px 2px 10px}
+.pool-course-link{display:block;font-size:.65rem;color:#879678;text-align:right;padding:10px 3px 0;line-height:1.8}
+.pool-add-course{flex-shrink:0;font-size:.69rem;line-height:1.8;padding-top:12px;margin-top:8px;border-top:1px dashed #d1c5ca;color:#879678}
+.chapter-timetable .schedule-task .scheduled-course{font-size:.65rem;line-height:1.8;color:#93839c;margin-bottom:5px;display:block;overflow-wrap:anywhere}
+.chapter-timetable .week-grid .schedule-task>b{font-size:.78rem;line-height:1.7;overflow-wrap:anywhere}
+.chapter-task-pool button:focus-visible,.chapter-task-pool a:focus-visible{outline:2px solid #8c9f77;outline-offset:1px}
+@media(max-width:1100px){.chapter-timetable .timetable-layout{grid-template-columns:245px minmax(0,1fr);gap:13px}.chapter-task-pool{padding:11px}}
+@media(max-width:760px){.chapter-timetable .timetable-layout{grid-template-columns:minmax(0,1fr)}.chapter-task-pool{position:static;max-height:420px;min-height:130px}.chapter-pool-scroll{max-height:270px}.chapter-timetable .week-grid{grid-template-columns:repeat(7,minmax(180px,1fr))}.pool-course-toggle b{font-size:.86rem}.pool-chapter-toggle b{font-size:.79rem}.pool-lesson>b{font-size:.77rem}.pool-lesson .task-actions button,.pool-lesson .task-actions .button{font-size:.7rem;padding:6px 10px}}
+@media(max-height:650px) and (min-width:761px){.chapter-task-pool{max-height:430px}}

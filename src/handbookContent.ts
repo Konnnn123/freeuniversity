@@ -55,9 +55,9 @@ export const handbookChapters:HandbookChapter[]=[
  {id:'timetable',title:'为好奇心留一点时间',tab:'安排一周',icon:'calendar',kicker:'AN INVITATION, NOT A DEADLINE',
  intro:'课表只是帮你记住想做的事。不排课也可以直接学习，没按计划走也可以随时改。',
  steps:[
-  {title:'把一节课放到某一天',text:'从任务池找到已备好的课时，点「安排」选择日期，或拖到对应那一天。'},
+  {title:'把一节课放到某一天',text:'左侧先选课程，再展开章节；每章先显示接下来的 3 节。点击「安排」选择日期，或拖到对应那一天。'},
   {title:'想换时间，就挪一下',text:'点「移动」或拖到另一天，也可以退回任务池。移除排课不会删除课程或已经留下的学习记录。'},
-  {title:'也可以让系统给一份建议',text:'点击「帮我安排一周」，选择天数、数量、时长和优先课程。建议会追加到已有课表，仍可自行调整。'}],
+  {title:'也可以让系统给一份建议',text:'点击「帮我安排一周」，选择课程、章节、天数、数量和时长。系统按顺序追加未完成课时，保留已有安排。'}],
  note:{title:'排课和完成分别记录',text:'任务放进课表不会自动完成。课表按实际日期保存，切换周次能看到不同周的安排。'},
  links:[{to:'/timetable',label:'看看这一周'}]},
  {id:'rewards',title:'把学过的一章收藏起来',tab:'成果与收藏',icon:'star',kicker:'SMALL REWARDS FOR REAL EXPLORATION',

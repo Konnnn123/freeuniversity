@@ -14,7 +14,7 @@ it.each([
 ['/courses',<Courses/>, '高级日语表达'],
 ['/courses/course-0',<Courses/>, '高级日语表达'],
 ['/courses/course-0/tasks/activity-0-0',<CourseStudy/>, '记录本次学习'],
-['/timetable',<Timetable/>, '为什么时间也是一种成本'],
+['/timetable',<Timetable/>, '经济学入门'],
 ['/library',<Library/>, '我的 PDF'],
 ['/library?tab=resources',<Library/>, 'CORE Econ'],
 ['/museum',<Museum/>, '学习足迹'],

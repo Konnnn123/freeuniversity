@@ -13,3 +13,5 @@ import './rewards.css';
 import './campusScenes.css';
 
 import './handbook.css';
+
+import './timetable.css';
