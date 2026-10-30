@@ -19,12 +19,21 @@ export function legacyStudyPath(d:Data,courseId?:string,activityId?:string){
  return activity?activityPath(activity):coursePath(course.id);
 }
 export function startCoursePath(d:Data,id:string){
+ const course=d.courses.find(c=>c.id===id);if(!course)return '/courses';
  const all=classroomLessons(d,id),lessons=all.filter(l=>!l.pdfTeachingPlan||!!l.labMaterialId),lesson=lessons.find(l=>l.status==='学习中')||lessons.find(l=>l.status!=='已完成')||lessons[0];
  if(lesson)return '/lessons/'+encodeURIComponent(lesson.id);
+ if(course.bookId)return '/books/'+encodeURIComponent(course.bookId)+'?course=1';
  return all.length?coursePath(id):coursePath(id)+'/study';
 }
 export function navigationSection(path:string){
  if(/^\/(courses|course-planner|lessons|studio|classroom|prep)(\/|$)/.test(path))return '/courses';
  if(/^\/(library|books|materials)(\/|$)/.test(path))return '/library';
  return path;
+}
+
+export function courseStudyTarget(d:Data,id:string,activityId?:string,explicitFree=false){
+ const course=d.courses.find(c=>c.id===id);if(!course)return '/courses';
+ if(activityId){const activity=d.activities.find(a=>a.id===activityId&&a.courseId===id);return !activity?coursePath(id):activity.lessonId?activityPath(activity):null}
+ if(explicitFree)return null;
+ const target=startCoursePath(d,id);return target===coursePath(id)+'/study'?null:target;
 }

@@ -1,0 +1,14 @@
+import {it,expect} from 'vitest';
+import {renderToString} from 'react-dom/server';
+import {MemoryRouter,Routes,Route} from 'react-router-dom';
+import {createSeed} from '../src/seed';
+import {upgradeArchive} from '../src/studioEngine';
+import {classroomLessons} from '../src/courseOrganization';
+import {courseStudyTarget,startCoursePath} from '../src/siteNavigation';
+import {CourseStudy} from '../src/CourseStudy';
+import {useStore} from '../src/store';
+const fixture=()=>{const d=upgradeArchive(createSeed()),c=d.courses.find(c=>c.id==='course-2')!;c.bookId='my-pdf';const lessons=classroomLessons(d,c.id);return {d,c,lessons}};
+it('routes a PDF with only original-reference chapters to preparation instead of the free-study template',()=>{const {d,c,lessons}=fixture();lessons.forEach(l=>{l.bookId=c.bookId;l.bookNodeId='original'});expect(startCoursePath(d,c.id)).toBe('/books/my-pdf?course=1');expect(courseStudyTarget(d,c.id)).toBe('/books/my-pdf?course=1')});
+it('routes pending PDF outlines to preparation, then opens a ready/in-progress lesson once available',()=>{const {d,c,lessons}=fixture();lessons.forEach((l,i)=>{l.pdfTeachingPlan={bookId:'my-pdf',nodeId:'ch',draftId:'draft',index:i,chapterOrder:0}});expect(startCoursePath(d,c.id)).toBe('/books/my-pdf?course=1');lessons[1].labMaterialId='ready-material';lessons[1].status='学习中';expect(courseStudyTarget(d,c.id)).toBe('/lessons/'+lessons[1].id)});
+it('preserves explicit free-study and scoped legacy tasks, without rewriting records',()=>{const {d,c}=fixture(),before=JSON.stringify(d),task=d.activities.find(a=>a.courseId===c.id&&!a.lessonId)!;expect(courseStudyTarget(d,c.id,undefined,true)).toBeNull();expect(courseStudyTarget(d,c.id,task.id)).toBeNull();const linked=d.activities.find(a=>a.courseId===c.id&&a.lessonId)!;expect(courseStudyTarget(d,c.id,linked.id)).toBe('/lessons/'+linked.lessonId);expect(courseStudyTarget(d,c.id,'missing')).toBe('/courses/'+c.id);expect(courseStudyTarget(d,'missing')).toBe('/courses');expect(JSON.stringify(d)).toBe(before)});
+it('shows real lesson links in explicit free-study navigation and hides original reference units',()=>{const {d,c,lessons}=fixture();const original=structuredClone(lessons[0]);original.id='original-reference';original.bookId='my-pdf';original.bookNodeId='ch';original.unitId='original-unit';d.units.push({id:'original-unit',courseId:c.id,name:'旧原书目录'});d.lessons!.push(original);useStore.setState({data:d,ready:true});const html=renderToString(<MemoryRouter initialEntries={['/courses/'+c.id+'/study?free=1']}><Routes><Route path="/courses/:courseId/study" element={<CourseStudy/>}/></Routes></MemoryRouter>);expect(html).toContain('href="/lessons/'+lessons[0].id+'"');expect(html).not.toContain('旧原书目录');expect(html).not.toContain('/lessons/original-reference');expect(html).toContain('记录本次学习')});
