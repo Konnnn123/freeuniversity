@@ -1,4 +1,4 @@
 // Shared by the browser, gateway and packaged Worker. Change the contract when
 // a server response requires a different browser-side validator.
-export const appRelease='2026-10-29.49';
+export const appRelease='2026-10-30.50';
 export const pdfClientContract='pdf-lessons-2';

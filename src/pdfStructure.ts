@@ -1,5 +1,5 @@
 export interface OutlineItem {title:string;dest?:unknown;items?:OutlineItem[];url?:string|null}
-export interface TocNode {id:string;parentId:string|null;title:string;depth:number;start:number|null;end:number|null;pageLabel?:string;samePage:boolean;rangeSource:'destination'|'children'|'unresolved'|'manual';issue?:string}
+export interface TocNode {id:string;parentId:string|null;title:string;depth:number;start:number|null;end:number|null;pageLabel?:string;samePage:boolean;rangeSource:'destination'|'children'|'unresolved'|'manual'|'printed-toc'|'headings'|'learning-segments';issue?:string}
 export interface PdfStructure {version:1;nodes:TocNode[];pageLabels:string[]|null;readAt:string}
 export interface StructureDocument {numPages:number;getOutline:()=>Promise<OutlineItem[]|null>;getDestination:(name:string)=>Promise<unknown[]|null>;getPageIndex:(ref:never)=>Promise<number>;getPageLabels:()=>Promise<string[]|null>}
 export async function readPdfStructure(doc:StructureDocument):Promise<PdfStructure>{const nodes:TocNode[]=[];let raw:OutlineItem[]|null=null,labels:string[]|null=null;raw=await doc.getOutline();try{labels=await doc.getPageLabels();if(labels?.length!==doc.numPages)labels=null}catch{/* Printed page labels are optional. */}
