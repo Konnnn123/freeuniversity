@@ -1,3 +1,12 @@
+# Netlify AI 路由缺失修复 · 2026-10-30.52
+
+- 用户确认实际网址为 https://free-university.netlify.app/。对实际线上网址作无密钥探测：首页 200，GET /api/app-info 和 POST /api/material-ai 均为 HTML 404。之前只有 Sites Worker 和本地网关，仓库没有 Netlify Functions 或部署配置；这解释了为什么 Sites 日志没有用户失败请求，前两版响应提示修正无法消除这次 404。
+- 新增 netlify.toml、独立 build:netlify（仅前端构建）及 netlify/functions/learning.mjs。通过函数 config.path 把版本、AI、检索和诊断四个同源路径交给原有 learningApi；不另建模型提示词或复制课程数据。
+- Netlify 网关将所有上游请求限制在 52 秒内，预留该平台 60 秒执行上限的错误返回时间；支持已有总览进度流、取消与旧 JSON 响应。密钥随浏览器请求临时使用，不加服务端持久密钥，不请求上传原 PDF。
+- 404 错误提示明确指出缺少部署接口，并保留 Netlify 请求编号；不再建议反复生成或重新上传。
+- 383 项检查、52 个文件通过，Netlify 前端构建通过。覆盖真实 Netlify Origin、已声明路由、无密钥 401、版本信息、共享 AI 调用、流式响应、跨站拒绝和平台前超时。实际付费模型生成未经用户密钥测试；线上路由在 GitHub 自动部署后另行核验。
+- 参考 Netlify 官方 Functions 路由与执行上限：https://docs.netlify.com/build/functions/configuration/ 。不会通过延长心跳宣称绕过平台执行时间限制。
+
 # 全书总览的长请求与错误响应 · 2026-10-30.51
 
 - 用户截图的目录已为 5 项、文字已提取 89 页，报错发生在「生成全书总览」。查明客户端把响应解析失败统称为「服务未返回有效内容」，无法区分网页、空响应、网关失败；HTTP 200 非接口内容还可能落入后续步骤。此缺陷已修复。当前 Worker 日志未含用户对应 API 调用，尚不能证明此次上游失败的具体 HTTP 状态或原因。

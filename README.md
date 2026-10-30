@@ -2,9 +2,9 @@
 
 一个按自己的节奏学习的像素校园。把好奇的问题或整本 PDF 整理成课程，在阅读中划线和评论，完成章节后领取收藏，布置自己的学习空间。
 
-[访问现有网站](https://free-university-cozy-campus.z16357959.chatgpt.site/)
+[访问 Netlify 网站](https://free-university.netlify.app/) · [原 Sites 地址](https://free-university-cozy-campus.z16357959.chatgpt.site/)
 
-本次源码对应网站版本 **2026-10-30.51**，网站访问权限沿用现有设置。
+本次源码对应网站版本 **2026-10-30.52**，网站访问权限沿用现有设置。
 
 ## 主要功能
 
@@ -83,7 +83,11 @@ tests/                    自动检查
 
 `npm run build` 生成页面、资源，以及包含同源 API 网关的 `dist/server/index.js` Worker 入口。
 
-完整 AI 功能需要支持 Worker 的运行环境。仅部署静态文件到 GitHub Pages 不会自动获得 AI API 网关。本次 GitHub 上传保存项目源码，现有网站继续使用原托管地址。
+Netlify：连接本仓库后，由 netlify.toml 指定 npm run build:netlify，发布 dist，并部署 netlify/functions/learning.mjs。该函数把 /api/app-info、/api/material-ai、/api/material-search 和 /api/learning-diagnostic 交给共享后端。只拖入 dist 不会部署这些接口。无需把个人 API Key 写入环境变量，继续使用站内全站 AI 设置。
+
+部署后检查 https://free-university.netlify.app/api/app-info 应为当前版本 JSON；不带密钥请求生成接口应返回 401 JSON，不应是网页 404。Functions 单次执行受平台上限约束，网关在 52 秒内主动结束超时请求，已保存步骤可继续；不会通过心跳绕过执行上限。参考 [Netlify 官方配置说明](https://docs.netlify.com/build/functions/configuration/)。
+
+Sites / Worker：保留 npm run build 与 dist/server/index.js。仅部署静态文件到 GitHub Pages 不会自动获得 AI API 网关。不同域名的本机学习存档不会自动互通，请继续使用已有资料所在的网址。
 
 ## 更新与验证
 

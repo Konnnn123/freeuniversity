@@ -2,8 +2,8 @@ export class LabApiError extends Error {code:string;diagnostic?:Record<string,un
 type Context={action:string;release:string};
 const object=(v:unknown):v is Record<string,any>=>!!v&&typeof v==='object'&&!Array.isArray(v);
 function responseProblem(response:Response,context:Context,kind='invalid_gateway_response'):LabApiError {
- const status=response.status,requestId=(response.headers.get('x-learning-request')||response.headers.get('cf-ray')||'').replace(/[^a-zA-Z0-9-]/g,'').slice(0,100),contentType=(response.headers.get('content-type')||'unknown').slice(0,120);
- const message=response.redirected||status===401||status===403?'网站登录或访问验证未通过，请刷新网站确认登录后继续。':status===504||status===524?'网站网关等待超时，未取得生成结果。':status===502||status===503?'网站网关暂时无法连接生成服务。':'网站返回了空响应或非接口内容，未取得生成结果。';
+ const status=response.status,requestId=(response.headers.get('x-learning-request')||response.headers.get('cf-ray')||response.headers.get('x-nf-request-id')||'').replace(/[^a-zA-Z0-9-]/g,'').slice(0,100),contentType=(response.headers.get('content-type')||'unknown').slice(0,120);
+ const message=status===404?'当前部署没有找到 AI 接口，需要部署本站配套的服务端函数；重复生成或重传 PDF 无法修复此问题。':response.redirected||status===401||status===403?'网站登录或访问验证未通过，请刷新网站确认登录后继续。':status===504||status===524?'网站网关等待超时，未取得生成结果。':status===502||status===503?'网站网关暂时无法连接生成服务。':'网站返回了空响应或非接口内容，未取得生成结果。';
  return new LabApiError(`${message}（HTTP ${status}）已保存的目录和内容保留，未自动重发。`,kind,{...context,httpStatus:status,contentType,requestId});
 }
 function resultBody(body:unknown,status:number,response:Response,context:Context){
