@@ -4,7 +4,7 @@ import {outlineSourceSlots} from './sourceGroups';
 import type {Data} from './model';
 import {uid} from './model';
 import {buildBookChunks,type PdfBook} from './bookStore';
-import {addMaterial,attachMaterialUnit} from './labEngine';
+import {addMaterial,attachMaterialUnit,validateLab} from './labEngine';
 import {blankLesson,saveLesson} from './lessonEngine';
 import {courseFromBook} from './bookCourse';
 import type {ShortLesson,MaterialAnalysis} from './labTypes';
@@ -73,5 +73,5 @@ export function acceptPdfTeaching(d:Data,b:PdfBook,p:PdfTeachingDraft){
  m.pdfTeaching={nodeId:p.nodeId,draftId:p.id,index,version:1,pages};m.sourceFile={bookId:b.id,name:b.name,pages:b.numPages,from:pages[0],to:pages.at(-1)!};m.provenance='AI 生成，待核对';m.analysis=analysis(structuredClone(spec),p.outline!.intro);
  const pending=d.lessons?.find(l=>l.pdfTeachingPlan?.draftId===p.id&&l.pdfTeachingPlan.index===index);if(pending){m.courseId=courseId;pending.title=spec.title;pending.description=spec.question;pending.objectives=[spec.question];pending.labMaterialId=m.id;pending.labLessonIndex=0;pending.mode='阅读学习';pending.steps=[spec.explanation,spec.example,spec.boundary].map(text=>({id:uid(),text}));pending.resourceLinks=[{resourceId:m.resourceId,scope:'原书对应片段与课程讲解'}];pending.completionCriteria=['看过问题、阅读解释，并尝试或选择跳过情境练习'];saveLesson(d,pending)}else attachMaterialUnit(d,id,courseId,p.outline!.title,unitId);const l=d.lessons!.find(l=>l.labMaterialId===id)!;l.pdfTeachingPlan={bookId:b.id,nodeId:p.nodeId,draftId:p.id,index,chapterOrder:b.teachingCourse?.nodeIds.indexOf(p.nodeId)??0};l.minutes=p.minutes;l.difficulty=p.level;d.activities.filter(a=>l.activityIds.includes(a.id)).forEach(a=>a.minutes=p.minutes);
  const r=d.resources.find(r=>r.id===m.resourceId)!;r.unitId=unitId;r.courseId=courseId;r.source='原书对应片段与AI教学讲解';r.scope='PDF '+pages.join('、')+' 页（本课引用范围）';r.guide=spec.explanation;
- });linkPdfClassroomRoute(d,courseId);const lessons=d.lessons!.filter(l=>d.readingLab!.materials.some(m=>m.id===l.labMaterialId&&m.pdfTeaching?.draftId===p.id));return {courseId,lessonId:lessons[0].id};
+ });validateLab(d);linkPdfClassroomRoute(d,courseId);const lessons=d.lessons!.filter(l=>d.readingLab!.materials.some(m=>m.id===l.labMaterialId&&m.pdfTeaching?.draftId===p.id));return {courseId,lessonId:lessons[0].id};
 }
