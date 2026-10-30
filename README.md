@@ -4,7 +4,7 @@
 
 [访问 Netlify 网站](https://free-university.netlify.app/) · [原 Sites 地址](https://free-university-cozy-campus.z16357959.chatgpt.site/)
 
-本次源码对应网站版本 **2026-10-30.55**，网站访问权限沿用现有设置。
+本次源码对应网站版本 **2026-10-30.56**，网站访问权限沿用现有设置。
 
 ## 主要功能
 
