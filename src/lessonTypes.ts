@@ -3,7 +3,7 @@ import type {ReadingAnnotation,ReadingState} from './readingTypes';
 export type LearningRoute='循序课程'|'主题探索';
 export type ResourceVerification='具体资源已核实'|'仅入口已核实'|'内置指南'|'待核实';
 export interface ResourceDetails {source?:string;language?:string;difficulty?:string;account?:'不需要'|'需要'|'可能需要';free?:'免费'|'部分免费'|'待确认';verification?:ResourceVerification;verifiedAt?:string;scope?:string;guide?:string}
-export interface Lesson {archivedFromClassroom?:boolean;
+export interface Lesson {chapterExclusion?:{bookId:string;nodeId:string;wasArchived:boolean};archivedFromClassroom?:boolean;
  pdfTeachingPlan?:{bookId:string;nodeId:string;draftId:string;index:number;chapterOrder:number};
  readingState?:ReadingState;annotations?:ReadingAnnotation[];
  bookId?:string;bookNodeId?:string;

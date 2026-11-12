@@ -1,13 +1,14 @@
+import {courseChapterNodes} from './bookChapterScope';
 import type {PdfRealignInput} from './pdfSourceAlignment';
 import {appRelease} from '../server/app-release.mjs';
 import {bookFailure,phaseName} from './bookDiagnostics';
 import {uid} from './model';
 import type {PdfBook} from './bookStore';
-import {chapterNodes,type TocNode} from './pdfStructure';
+import type {TocNode} from './pdfStructure';
 import {createPdfTeachingDraft,checkPdfTeachingOutline,runPdfTeachingDraft,type PdfLessonRepairInput} from './pdfTeachingEngine';
 import type {PdfTeachingDraft,BookTeachingPlan} from './pdfTeachingTypes';
 import {outlineSourceSlots,bindOutlineSourceSlot,slotOutlineCandidates,OutlineContractError,type OutlineSourceSlot} from './outlineSourceSlots';
-export function startBookTeaching(b:PdfBook,preferences:Pick<BookTeachingPlan,'instruction'|'level'|'minutes'>){const nodes=chapterNodes(b.structure!);if(!nodes.length)throw new Error('请先读取原书目录');b.teachingCourse={nodeIds:nodes.filter(n=>n.start!==null&&n.end!==null).map(n=>n.id),unresolved:nodes.filter(n=>n.start===null||n.end===null).map(n=>n.id),createdAt:new Date().toISOString(),instruction:preferences.instruction,level:preferences.level,minutes:preferences.minutes,status:'paused',stage:'课程大纲待准备',errors:{}};if(!b.teachingCourse.nodeIds.length)throw new Error('请先确认章节页码');return b.teachingCourse}
+export function startBookTeaching(b:PdfBook,preferences:Pick<BookTeachingPlan,'instruction'|'level'|'minutes'>){const nodes=courseChapterNodes(b);if(!nodes.length)throw new Error('请先读取原书目录');b.teachingCourse={nodeIds:nodes.filter(n=>n.start!==null&&n.end!==null).map(n=>n.id),unresolved:nodes.filter(n=>n.start===null||n.end===null).map(n=>n.id),createdAt:new Date().toISOString(),instruction:preferences.instruction,level:preferences.level,minutes:preferences.minutes,status:'paused',stage:'课程大纲待准备',errors:{}};if(!b.teachingCourse.nodeIds.length)throw new Error('请先确认章节页码');return b.teachingCourse}
 export async function runPdfChapterOutline(p:PdfTeachingDraft,request:(input:{segments:PdfTeachingDraft['segments'];sourceSlots:OutlineSourceSlot[];part:number;total:number;repair?:boolean;previous?:unknown;issues?:{field:string;reason:string}[]})=>Promise<unknown>,persist:()=>Promise<void>,signal?:AbortSignal,maxSlots=8){
  if(!Number.isInteger(maxSlots)||maxSlots<1||maxSlots>8)throw new Error('原文分组批次应为1至8组');if(p.outline)return;p.outlineParts??=[];p.outlineSlots??={};p.outlineResponses??={};p.outlineFragments??={};
  const stop=()=>{if(signal?.aborted)throw new DOMException('已暂停','AbortError')};const total=Math.ceil(p.segments.length/16);
