@@ -15,7 +15,7 @@ it.each([
 ['/courses/course-0',<Courses/>, '高级日语表达'],
 ['/courses/course-0/tasks/activity-0-0',<CourseStudy/>, '记录本次学习'],
 ['/timetable',<Timetable/>, '经济学入门'],
-['/library',<Library/>, '我的 PDF'],
+['/library',<Library/>, '我的原书'],
 ['/library?tab=resources',<Library/>, 'CORE Econ'],
 ['/museum',<Museum/>, '学习足迹'],
 ['/settings',<Settings/>, '导出 JSON 存档'],
