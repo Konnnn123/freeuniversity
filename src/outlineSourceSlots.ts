@@ -1,3 +1,4 @@
+import {MAX_OUTLINE_LESSONS} from './pdfTeachingTypes';
 import type {PdfTeachingDraft,PdfTeachingOutline} from './pdfTeachingTypes';
 import {checkPdfTeachingOutline} from './pdfTeachingEngine';
 export {outlineSourceSlots,type OutlineSourceSlot} from './sourceGroups';
@@ -13,7 +14,7 @@ export function bindOutlineSourceSlot(value:unknown,source:OutlineSourceSlot,dra
  const text=(v:unknown,max:number)=>typeof v==='string'&&v.trim().length>0&&v.length<=max;
  if(!text(v.title,150))issues.push({field:'title',reason:'缺少单元名称或超过150字'});
  if(!text(v.intro,600))issues.push({field:'intro',reason:'缺少单元介绍或超过600字'});
- if(!Array.isArray(v.lessons)||!v.lessons.length||v.lessons.length>8)issues.push({field:'lessons',reason:Array.isArray(v.lessons)?'实际返回 '+v.lessons.length+' 节，需要1至8节完整设计':'未返回可读取的课时列表；收到字段：'+Object.keys(v).filter(k=>v[k]!==undefined).slice(0,12).join('、')});
+ if(!Array.isArray(v.lessons)||!v.lessons.length||v.lessons.length>MAX_OUTLINE_LESSONS)issues.push({field:'lessons',reason:Array.isArray(v.lessons)?'实际返回 '+v.lessons.length+' 节，需至少1节且不超过单章 '+MAX_OUTLINE_LESSONS+' 节的上限':'未返回可读取的课时列表；收到字段：'+Object.keys(v).filter(k=>v[k]!==undefined).slice(0,12).join('、')});
  else v.lessons.forEach((l:any,i:number)=>{for(const [field,max]of [['title',150],['question',500],['focus',1000]] as const)if(!text(l?.[field],max))issues.push({field:`lessons[${i}].${field}`,reason:'缺失、为空或超过长度限制'})});
  if(issues.length)throw new OutlineContractError(issues);
  return checkPdfTeachingOutline({title:v.title,intro:v.intro,lessons:v.lessons.map((l:any)=>({title:l.title,question:l.question,focus:l.focus,segmentIds:source.segments.map(s=>s.id)}))},{...draft,segments:source.segments});

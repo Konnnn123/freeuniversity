@@ -1,3 +1,4 @@
+import {MAX_OUTLINE_LESSONS} from './pdfTeachingTypes';
 import {checkPdfRealignment,savePdfRealignment,type PdfRealignInput} from './pdfSourceAlignment';
 import {checkLessonContent,generatedPdfLesson,LessonContractError,repairFields,mergeLessonRepair,type LessonIssue} from './lessonContract';
 import {outlineSourceSlots} from './sourceGroups';
@@ -28,7 +29,7 @@ export function teachingInput(draft:PdfTeachingDraft,index:number){const l=draft
 export function teachingPages(draft:PdfTeachingDraft,index:number){return [...new Set(draft.outline!.lessons[index].segmentIds.flatMap(id=>{const s=draft.segments.find(s=>s.id===id)!;return Array.from({length:s.to-s.from+1},(_,i)=>s.from+i)}))].sort((a,b)=>a-b)}
 export function checkPdfTeachingOutline(value:unknown,draft:PdfTeachingDraft):PdfTeachingOutline{
  const v=value as PdfTeachingOutline,known=new Set(draft.segments.map(s=>s.id));
- if(!v||!str(v.title,150)||!str(v.intro,600)||!Array.isArray(v.lessons)||v.lessons.length<1||v.lessons.length>256)throw new Error('课程大纲需包含完整的小课');
+ if(!v||!str(v.title,150)||!str(v.intro,600)||!Array.isArray(v.lessons)||v.lessons.length<1||v.lessons.length>MAX_OUTLINE_LESSONS)throw new Error('课程大纲需包含完整的小课');
  const used=new Set<string>();for(const l of v.lessons){if(!str(l.title,150)||!str(l.question)||!str(l.focus,1000)||!Array.isArray(l.segmentIds)||!l.segmentIds.length||l.segmentIds.length>2||new Set(l.segmentIds).size!==l.segmentIds.length||l.segmentIds.some(id=>!known.has(id)))throw new Error('小课引用了无效的原文片段，请重新整理大纲');l.segmentIds.forEach(id=>used.add(id));const text=l.segmentIds.map(id=>draft.segments.find(s=>s.id===id)!.text).join('\n\n');if(text.trim().length<40)throw new Error('这一课原文过短，请与相邻内容合并后再备课');if(text.length>22000)throw new Error('单课原文过长，需要进一步拆课')}
  if(used.size!==known.size)throw new Error('大纲遗漏了本章原文片段，请重新整理，原内容保留');return structuredClone(v);
 }

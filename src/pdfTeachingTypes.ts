@@ -1,3 +1,4 @@
+export const MAX_OUTLINE_LESSONS=256;
 import type {BookChunk} from './bookStore';
 import type {ShortLesson} from './labTypes';
 import type {LessonIssue} from './lessonContract';
