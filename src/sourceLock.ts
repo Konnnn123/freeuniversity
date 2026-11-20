@@ -1,0 +1,2 @@
+export async function withSourceLock<T>(id:string,run:()=>Promise<T>):Promise<T>{if(typeof navigator!=='undefined'&&navigator.locks)return navigator.locks.request('free-university:book-course:'+id,{ifAvailable:true},async lock=>{if(!lock)throw new Error('这份资料正在其他页面使用，请先暂停备课后重试。');return run()});return run()}
+export function withSourceLocks<T>(ids:string[],run:()=>Promise<T>):Promise<T>{const sorted=[...new Set(ids)].sort();const next=(index:number):Promise<T>=>index===sorted.length?run():withSourceLock(sorted[index],()=>next(index+1));return next(0)}

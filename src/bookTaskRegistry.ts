@@ -1,5 +1,5 @@
 import type {bookTeachingProgress} from './bookTeachingCourse';
-export interface BookTaskState {bookId:string;name:string;mode:'outline'|'lessons';status:'running'|'completed'|'issues'|'paused'|'failed';stage:string;error?:string;failures?:{chapter:string;message:string}[];startedAt:number;progress?:ReturnType<typeof bookTeachingProgress>}
+export interface BookTaskState {target?:string;bookId:string;name:string;mode:'outline'|'lessons';status:'running'|'completed'|'issues'|'paused'|'failed';stage:string;error?:string;failures?:{chapter:string;message:string}[];startedAt:number;progress?:ReturnType<typeof bookTeachingProgress>}
 export interface BookTaskContext {signal:AbortSignal;update:(patch:Partial<BookTaskState>)=>void}
 export function createBookTaskRegistry(){
  let rows:BookTaskState[]=[];const empty:BookTaskState[]=[],listeners=new Set<()=>void>(),jobs=new Map<string,{controller:AbortController;promise:Promise<void>}>();const emit=()=>listeners.forEach(f=>f());

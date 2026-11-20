@@ -1,0 +1,18 @@
+import {it,expect} from 'vitest';
+import {MemoryRouter} from 'react-router-dom';
+import {renderToString} from 'react-dom/server';
+import {checkParticipation,taskCorrect,taskReady,initialTaskAnswer,type ParticipationTask} from '../src/participation';
+import {Participation} from '../src/ParticipationExercises';
+import {checkLessonContent,generatedPdfLesson} from '../src/lessonContract';
+import {sampleAnalysis} from '../src/labSample';
+import {createSeed} from '../src/seed';
+import {upgradeArchive} from '../src/studioEngine';
+const sort:ParticipationTask={kind:'sort',prompt:'排列有依据的步骤',items:['执行','确认','复核'],order:[1,0,2],feedback:'先确认条件，再执行，最后复核。'};
+it('grades ordering and multi-evidence selection deterministically without an AI call',()=>{expect(taskCorrect(sort,[1,0,2])).toBe(true);expect(taskCorrect(sort,[0,1,2])).toBe(false);expect(initialTaskAnswer(sort)).not.toEqual(sort.order);const e:ParticipationTask={kind:'evidence',prompt:'找依据',items:['依据甲','无关项','依据乙'],correct:[0,2],feedback:'逐项核对'};expect(taskCorrect(e,[2,0])).toBe(true);expect(taskCorrect(e,[0])).toBe(false);expect(taskReady(e,[])).toBe(false)});
+it.each(['classify','match'] as const)('requires a response for each %s item and checks every mapping',kind=>{const t:ParticipationTask={kind,prompt:'选对应概念',items:['项目甲','项目乙'],categories:['一','二'],answers:[1,0],feedback:'解释分类依据'};expect(taskReady(t,[-1,0])).toBe(false);expect(taskCorrect(t,[1,0])).toBe(true);expect(taskCorrect(t,[0,0])).toBe(false)});
+it.each(['response','observe'] as const)('records %s participation without pretending it is a correctness or mastery score',kind=>{const t:ParticipationTask={kind,prompt:'写下你的判断及依据',reference:'可以有不同合理解释。',criteria:['引用条件']};expect(taskCorrect(t,'一段回答')).toBeNull();expect(taskReady(t,'  ')).toBe(false);expect(taskReady(t,'我的理解')).toBe(true);expect(checkParticipation([t])).toEqual([t])});
+it('rejects unsupported types, duplicate ordering answers and incomplete classification keys',()=>{expect(()=>checkParticipation([{...sort,kind:'html'}])).toThrow('类型');expect(()=>checkParticipation([{...sort,order:[1,1,2]}])).toThrow('完整');expect(()=>checkParticipation([{kind:'classify',prompt:'分类',items:['甲','乙'],categories:['一','二'],answers:[0],feedback:'说明'}])).toThrow('不完整')});
+it('accepts a fully specified participatory lesson with no multiple-choice questions, preserving old quizzes',()=>{const spec={...sampleAnalysis.lessons[0],paragraphs:[1],quiz:[],activities:[sort]};expect(()=>checkLessonContent(spec,'段落正文')).not.toThrow();expect(generatedPdfLesson({usable:true,lesson:spec},'实际原文',spec).activities).toEqual([sort]);expect(()=>checkLessonContent({...spec,activities:undefined},'段落正文')).toThrow('情境练习');expect(()=>checkLessonContent(sampleAnalysis.lessons[0],Array.from({length:20},()=> '原文').join('\n'))).not.toThrow()});
+it('renders a wrong submitted answer in the existing red feedback style and offers keyboard ordering',()=>{const l=upgradeArchive(createSeed()).lessons![0];l.answers={'task-0':JSON.stringify([0,1,2]),'task-0-state':'done'};const html=renderToString(<MemoryRouter><Participation task={sort} index={0} lesson={l} source="原文"/></MemoryRouter>);expect(html).toContain('lab-feedback incorrect');expect(html).toContain('上移');expect(html).toContain('下移');expect(html).toContain('这次跳过')});
+
+it('refuses invented evidence excerpts even when their indexes look valid',()=>{const spec={...sampleAnalysis.lessons[0],paragraphs:[1],quiz:[],activities:[{kind:'evidence',prompt:'哪些原句支持判断？',items:['原文中的一句','AI编造的另一句'],correct:[0],feedback:'解释依据'}]};expect(()=>checkLessonContent(spec,'原文中的一句\n真实的另一句')).toThrow('未逐字');spec.activities[0].items[1]='真实的另一句';expect(()=>checkLessonContent(spec,'原文中的一句\n真实的另一句')).not.toThrow()});

@@ -1,8 +1,10 @@
+import {validateFigures} from './lessonFigures';
 import type {Data} from './model';
 export function validateLessons(d:Data){
  if(d.version>=2&&!Array.isArray(d.lessons))throw new Error('存档缺少课时');
  const ids=new Set<string>();
  for(const l of d.lessons||[]){
+  if(l.figures!==undefined)validateFigures(l.figures);
   if(l.readingState){const s=l.readingState;if(!['question','explanation','practice'].includes(s.active)||!s.phases||Object.entries(s.phases).some(([k,v])=>!['question','explanation','practice'].includes(k)||!['done','skipped'].includes(v))||(s.completionLogId!==undefined&&typeof s.completionLogId!=='string'))throw new Error('课时阅读进度格式有误')}
   if(l.annotations){const ids=new Set<string>();if(!Array.isArray(l.annotations)||l.annotations.some(a=>!a||typeof a.id!=='string'||ids.has(a.id)||(ids.add(a.id),false)||!['question','explanation','example','boundary'].includes(a.field)||!Number.isInteger(a.start)||!Number.isInteger(a.end)||a.start<0||a.end<=a.start||typeof a.quote!=='string'||a.quote.length>5000||a.end-a.start!==a.quote.length||typeof a.prefix!=='string'||typeof a.suffix!=='string'||!['highlight','underline'].includes(a.style)||!['yellow','green','purple'].includes(a.color)||typeof a.comment!=='string'||a.comment.length>5000||typeof a.createdAt!=='string'))throw new Error('课时标注格式有误')}
 
