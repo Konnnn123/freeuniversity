@@ -1,4 +1,4 @@
-declare module '*.mjs' {export function learningApi(request:Request,fetcher?:typeof fetch):Promise<Response>;export function gateway():import('vite').Plugin}
+declare module '*.mjs' {export function canonicalParticipationKind(value:unknown):'sort'|'classify'|'match'|'evidence'|'response'|'observe'|undefined;export function learningApi(request:Request,fetcher?:typeof fetch):Promise<Response>;export function gateway():import('vite').Plugin}
 
 declare module '*?url' {const value:string;export default value}
 declare module '*?raw' {const value:string;export default value}

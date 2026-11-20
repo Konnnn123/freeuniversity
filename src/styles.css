@@ -11,3 +11,5 @@
 .topic-source-scope label,.participation-task label{flex-direction:row}.lab-material-list .actions{flex-wrap:wrap}.exercise-designer{border-top:1px dashed #c8b5cb;padding-top:20px;margin:24px 0}.exercise-designer .actions{flex-wrap:wrap}.exercise-designer select{max-width:100%}
 
 .source-course-links{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:16px 0;overflow-wrap:anywhere}
+
+.retained-practice-payload{max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85rem;line-height:1.8;padding:14px;border:1px solid #b8a4bc;background:#fff8e7}

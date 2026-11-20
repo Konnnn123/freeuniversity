@@ -1,0 +1,3 @@
+// Labels only: these aliases never supply a question, answer or missing feedback.
+const aliases={sort:'sort',sorting:'sort',ordering:'sort',order:'sort','排序':'sort',classify:'classify',classification:'classify','分类':'classify',match:'match',matching:'match','配对':'match',evidence:'evidence',evidence_selection:'evidence','选择依据':'evidence',response:'response',short_answer:'response',open_response:'response',open_ended:'response',reflection:'response','简答':'response','开放回答':'response',observe:'observe',observation:'observe','观察':'observe'};
+export function canonicalParticipationKind(value){if(typeof value!=='string')return;const key=value.trim().toLowerCase().replaceAll('-','_');return Object.hasOwn(aliases,key)?aliases[key]:undefined}
