@@ -1,4 +1,4 @@
-import {useEffect,useRef} from 'react';
+import {Fragment,useEffect,useRef,type ReactNode} from 'react';
 import type {ReadingAnnotation,ReadingField} from './readingTypes';
 import {anchorAnnotation,readingDocument,type ReadingBlock} from './readingDocument';
 import {semanticParts} from './conceptLearning';
@@ -10,12 +10,12 @@ function BlockText({block,annotations,emphasis,onOpen,terms=[]}:{block:ReadingBl
  const points=[...new Set([0,block.text.length,...termRanges.flatMap(r=>[r.start,r.end]),...runs.flatMap(r=>[r.start,r.end]),...semantics.flatMap(r=>[r.start,r.end]),...marks.flatMap(r=>[r.start,r.end])])].sort((a,b)=>a-b);
  return <>{points.slice(0,-1).map((start,i)=>{const end=points[i+1],text=block.text.slice(start,end),bold=runs.find(r=>r.start<=start&&r.end>=end)?.bold||termRanges.some(r=>r.start<=start&&r.end>=end),kind=semantics.find(r=>r.start<=start&&r.end>=end)?.kind||'plain';const mark=marks.filter(m=>m.start<=start&&m.end>=end).at(-1);const content=bold?<strong>{text}</strong>:text;return mark?<mark key={i} className={'reader-mark mark-'+mark.annotation.color+' mark-'+mark.annotation.style} role="button" tabIndex={0} title={mark.annotation.comment||'查看或评论这条标注'} onClick={()=>{if(window.getSelection()?.isCollapsed===false)return;onOpen(mark.annotation)}} onKeyDown={e=>{if(e.key==='Enter')onOpen(mark.annotation)}}>{content}</mark>:<span className={emphasis?'reading-'+kind:undefined} key={i}>{content}</span>})}</>
 }
-export function AnnotatedReading({field,text,annotations,onSelect,onSelectionEnd,onOpen,emphasis=true,terms=[]}:{field:ReadingField;text:string;annotations:ReadingAnnotation[];onSelect:(s:ReadingSelection)=>void;onSelectionEnd?:()=>void;onOpen:(a:ReadingAnnotation)=>void;emphasis?:boolean;terms?:string[]}){
+export function AnnotatedReading({field,text,annotations,onSelect,onSelectionEnd,onOpen,emphasis=true,terms=[],afterBlock}:{field:ReadingField;text:string;annotations:ReadingAnnotation[];onSelect:(s:ReadingSelection)=>void;onSelectionEnd?:()=>void;onOpen:(a:ReadingAnnotation)=>void;emphasis?:boolean;terms?:string[];afterBlock?:(block:ReadingBlock,index:number)=>ReactNode}){
  const root=useRef<HTMLDivElement>(null),doc=readingDocument(text);
  const readSelection=()=>{if(!root.current)return;const result=selectionInReader(root.current,field,text);if(result)onSelect(result);else onSelectionEnd?.()};
  useEffect(()=>{const selected=()=>readSelection();document.addEventListener('selectionchange',selected);return()=>document.removeEventListener('selectionchange',selected)});
  const anchored=annotations.filter(a=>a.field===field).flatMap(annotation=>{const p=anchorAnnotation(doc.text,annotation);return p?[{annotation,...p}]:[]});
- return <div ref={root} className="annotated-reading reading-body" data-reading-field={field} title="选中文字可高亮、划线或评论" onPointerUp={readSelection} onKeyUp={readSelection}>{doc.blocks.map((b,i)=>{const content=<BlockText block={b} annotations={anchored} onOpen={onOpen} emphasis={emphasis} terms={terms}/>;return b.kind==='heading'?<h3 key={i} data-reading-offset={b.start}>{content}</h3>:b.kind==='list'?<p key={i} className="reading-list-line" data-reading-offset={b.start}>{content}</p>:<p key={i} data-reading-offset={b.start}>{content}</p>})}</div>
+ return <div ref={root} className="annotated-reading reading-body" data-reading-field={field} title="选中文字可高亮、划线或评论" onPointerUp={readSelection} onKeyUp={readSelection}>{doc.blocks.map((b,i)=>{const content=<BlockText block={b} annotations={anchored} onOpen={onOpen} emphasis={emphasis} terms={terms}/>;const node=b.kind==='heading'?<h3 key={i} data-reading-offset={b.start}>{content}</h3>:b.kind==='list'?<p key={i} className="reading-list-line" data-reading-offset={b.start}>{content}</p>:<p key={i} data-reading-offset={b.start}>{content}</p>;return <Fragment key={i}>{node}{afterBlock?.(b,i)}</Fragment>})}</div>
 }
 
 export function selectionInReader(root:HTMLElement,field:ReadingField,text:string):ReadingSelection|null{const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.rangeCount)return null;const r=sel.getRangeAt(0);if(!root.contains(r.startContainer)||!root.contains(r.endContainer))return null;
