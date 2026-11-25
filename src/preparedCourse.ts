@@ -4,7 +4,9 @@ import type {ShortLesson} from './labTypes';
 import {generatedPdfLesson,LessonContractError} from './lessonContract';
 import {readingDocument} from './readingDocument';
 export const preparedPlanKey=(owner:string)=>'prepared-course:'+owner;
-export function detectMaterialKind(paragraphs:OriginalParagraph[],pages:number,chapters=1):Exclude<MaterialKind,'auto'>{const sample=paragraphs.slice(0,80).map(p=>p.text).join('\n');if(pages<=60&&/\babstract\b|摘要/i.test(sample)&&/\b(?:doi|methods?|participants?|research)\b|研究方法/i.test(sample))return 'paper';if(pages>60||chapters>=5)return 'book';if(/\b(?:step.by.step|manual|guidelines?)\b|操作步骤|使用指南|操作手册/.test(sample))return 'guide';return 'report'}
+export interface PreparedOutlineIssue {field:string;reason:string}
+export class PreparedOutlineError extends Error {constructor(public issues:PreparedOutlineIssue[]){super(issues.map(i=>i.reason).join('；'));this.name='PreparedOutlineError'}}
+export function detectMaterialKind(paragraphs:OriginalParagraph[],pages:number,chapters=1):Exclude<MaterialKind,'auto'>{const sample=paragraphs.slice(0,80).map(p=>p.text).join('\n');const front=paragraphs.filter(p=>p.page<=(paragraphs[0]?.page||1)+1).map(p=>p.text).join('\n');if(pages<=60&&(/\babstract\b|摘要/i.test(sample)&&/\b(?:doi|methods?|participants?|research)\b|研究方法/i.test(sample)||/(?:^|\n)\s*(?:doi\s*[:：]?\s*10\.\d{4,9}\/|https?:\/\/doi\.)/i.test(front)&&/\b(?:methods?|participants?|research|study|journal)\b|研究|方法|期刊/i.test(sample)))return 'paper';if(pages>60||chapters>=5)return 'book';if(/\b(?:step.by.step|manual|guidelines?)\b|操作步骤|使用指南|操作手册/.test(sample))return 'guide';return 'report'}
 export function lessonBudget(kind:Exclude<MaterialKind,'auto'>,depth:ReadingDepth,chapters=1){const maximum=kind==='paper'?{quick:3,standard:5,deep:8}[depth]:kind==='book'?Math.min(96,Math.max(4,chapters)*{quick:1,standard:3,deep:5}[depth]):{quick:4,standard:7,deep:12}[depth];return {target:Math.max(1,Math.round(maximum*.8)),maximum}}
 const str=(x:unknown,n:number)=>typeof x==='string'&&!!x.trim()&&x.length<=n;
 export function validateOriginalParagraphs(value:unknown):asserts value is OriginalParagraph[]{if(!Array.isArray(value)||value.length>20000||new Set(value.map(p=>p?.id)).size!==value.length||value.some(p=>!p||!/^p-[a-f0-9]{24}$/.test(p.id)||!str(p.bookId,200)||!str(p.name,1000)||!Number.isInteger(p.page)||p.page<1||!Number.isInteger(p.order)||p.order<0||!str(p.text,3500)||!['body','heading','reference','metadata','note'].includes(p.role)||(p.kind!==undefined&&p.kind!=='text')))throw new Error('提取的原文段格式有误')}
@@ -13,8 +15,27 @@ export function validateBilingualParagraphs(value:unknown):asserts value is Bili
 export function checkPreparedOutline(raw:unknown,pool:OriginalParagraph[],kind:Exclude<MaterialKind,'auto'>,maximum:number):PreparedOutline{
  const v=raw as {title?:string;intro?:string;reason?:string;units?:{title:string;lessons:{title:string;question:string;focus:string;sourceSlots:number[]}[]}[]};
  if(!v||!str(v.title,300)||!str(v.intro,2200)||!str(v.reason,800)||!Array.isArray(v.units)||!v.units.length||v.units.length>32)throw new Error('适量课程大纲尚未完整，原资料保留');let count=0;
- const units=v.units.map(u=>{if(!u||!str(u.title,300)||!Array.isArray(u.lessons)||!u.lessons.length||u.lessons.length>8)throw new Error('学习单元需要1–8节有明确问题的小课');return {title:u.title,lessons:u.lessons.map(l=>{count++;if(!l||!str(l.title,300)||!str(l.question,1500)||!str(l.focus,2000)||!Array.isArray(l.sourceSlots)||!l.sourceSlots.length||l.sourceSlots.length>60||new Set(l.sourceSlots).size!==l.sourceSlots.length||l.sourceSlots.some(n=>!Number.isInteger(n)||n<1||n>pool.length))throw new Error('小课选择了无效原文段，未采用');const paragraphs=l.sourceSlots.map(n=>pool[n-1]);if(paragraphs.every(p=>p.role==='metadata'||p.role==='reference'))throw new Error('作者信息、参考文献和出版声明默认保留为资料，不单独排课');if(paragraphs.reduce((sum,p)=>sum+p.text.length+120,0)>21000)throw new Error('单课原文过长，请合并教学问题而非堆叠原文');return {title:l.title,question:l.question,focus:l.focus,paragraphIds:paragraphs.map(p=>p.id)}})}});
+ const units=v.units.map(u=>{if(!u||!str(u.title,300)||!Array.isArray(u.lessons)||!u.lessons.length||u.lessons.length>8)throw new Error('学习单元需要1–8节有明确问题的小课');return {title:u.title,lessons:u.lessons.map(l=>{count++;if(!l||!str(l.title,300)||!str(l.question,1500)||!str(l.focus,2000)||!Array.isArray(l.sourceSlots)||!l.sourceSlots.length||new Set(l.sourceSlots).size!==l.sourceSlots.length||l.sourceSlots.some(n=>!Number.isInteger(n)||n<1||n>pool.length))throw new Error('小课选择了无效原文段，未采用');const paragraphs=l.sourceSlots.map(n=>pool[n-1]);if(paragraphs.every(p=>p.role==='metadata'||p.role==='reference'))throw new Error('作者信息、参考文献和出版声明默认保留为资料，不单独排课');if(preparedInput(paragraphs).length>22000)throw new Error('单课原文过长，请合并教学问题而非堆叠原文');return {title:l.title,question:l.question,focus:l.focus,paragraphIds:paragraphs.map(p=>p.id)}})}});
  if(count>maximum)throw new Error('本次大纲有'+count+'课，超过当前阅读深度的'+maximum+'课上限，请按整份材料主线合并课题');return {title:v.title!,intro:v.intro!,reason:v.reason!,kind,units};
+}
+// Source groups are explicit input scopes, not a quota of one or two per lesson.
+// A sole scope is owned by the program; multiple scopes must be selected explicitly.
+export function bindPreparedOutline(raw:unknown,pool:OriginalParagraph[],groups:{slot:number;paragraphs:OriginalParagraph[]}[],kind:Exclude<MaterialKind,'auto'>,maximum:number):PreparedOutline{
+ const value=structuredClone(raw) as any,issues:PreparedOutlineIssue[]=[],known=new Map(groups.map(g=>[g.slot,g])),indices=new Map(pool.map((p,i)=>[p.id,i+1]));
+ if(!value||!Array.isArray(value.units)||value.units.some((u:any)=>!u||!Array.isArray(u.lessons)))return checkPreparedOutline(value,pool,kind,maximum);
+ const count=value.units.reduce((n:number,u:any)=>n+u.lessons.length,0);
+ if(count>maximum)issues.push({field:'lessons',reason:`本次大纲有${count}课，当前上限为${maximum}课；请合并相近问题，保留研究主线，不要截掉末尾课程`});
+ for(const [i,u]of value.units.entries())for(const [j,l]of u.lessons.entries()){
+  const field=`units[${i}].lessons[${j}].sourceGroups`;if(!l||typeof l!=='object'||Array.isArray(l)){issues.push({field,reason:`第${i+1}单元第${j+1}课缺少有效设计`});continue}
+  const input=Array.isArray(l.sourceGroups)?l.sourceGroups:[l.sourceGroups],slots=groups.length===1?[groups[0].slot]:[...new Set(input.map((n:unknown)=>typeof n==='string'&&/^[1-9]\d*$/.test(n)?Number(n):n))];
+  if(!slots.length||slots.some(n=>!Number.isSafeInteger(n)||!known.has(n as number))){issues.push({field,reason:`「${String(l.title||'未命名课时').slice(0,80)}」的资料组为${JSON.stringify(l.sourceGroups)??'未填写'}；本批仅有${groups.map(g=>g.slot).join('、')}组。这是资料组编号，不是PDF页码或课时编号`});continue}
+  const paragraphs=[...new Map(slots.flatMap(n=>known.get(n as number)!.paragraphs).map(p=>[p.id,p])).values()].sort((a,b)=>(indices.get(a.id)||0)-(indices.get(b.id)||0)),sourceSlots=paragraphs.map(p=>indices.get(p.id));
+  if(sourceSlots.some(n=>n===undefined)){issues.push({field,reason:'所选原文已变化，请重新核对本批资料'});continue}
+  if(preparedInput(paragraphs).length>22000){issues.push({field,reason:`「${String(l.title||'未命名课时').slice(0,80)}」引用原文超过单课22000字符范围；请围绕合并后的主问题选择必要资料组，而不是累计所有引用`});continue}
+  l.sourceSlots=sourceSlots;
+ }
+ if(issues.length)throw new PreparedOutlineError(issues);
+ return checkPreparedOutline(value,pool,kind,maximum);
 }
 export function preparedInput(pool:OriginalParagraph[]){return pool.map((p,i)=>`[原文段 ${i+1}] ${p.kind==='text'?'文本段':'PDF物理页'} ${p.page}\n${p.text}`).join('\n\n')}
 export function sectionExplanation(sections:TeachingSection[]){return sections.map(s=>'## '+s.title+'\n\n'+s.text).join('\n\n')}
