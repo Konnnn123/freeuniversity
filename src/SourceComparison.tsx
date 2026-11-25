@@ -1,3 +1,4 @@
+import {PreparedSourceComparison} from './PreparedSourceComparison';
 import './sourceComparison.css';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Link} from 'react-router-dom';
@@ -21,7 +22,8 @@ export async function readComparisonPage(source:ReturnType<typeof comparisonSour
   return {text:cached?cached.text:await services.pdf(page),snapshot:false,pdf:!b.textSource,status:''};
  }catch(e){return fallback((e as Error).message+' 已显示本课保存的原文片段。')}
 }
-export function SourceComparison({material,lessonId,teaching,position,onPosition,onConfigure,onClose}:{material:ReadingMaterial;lessonId:string;teaching:string;position:ComparePosition;onPosition:(value:Partial<ComparePosition>)=>void;onConfigure:()=>void;onClose:()=>void}){
+export function SourceComparison({material,lessonId,teaching,position,onPosition,onConfigure,onClose,selected,onClear}:{selected?:string[];onClear?:()=>void;material:ReadingMaterial;lessonId:string;teaching:string;position:ComparePosition;onPosition:(value:Partial<ComparePosition>)=>void;onConfigure:()=>void;onClose:()=>void}){
+ if(material.preparedParagraphs)return <PreparedSourceComparison material={material} selected={selected} onClear={onClear} onClose={onClose}/>;
  const sources=comparisonSources(material),source=sources.find(s=>s.bookId===position.bookId)||sources[0];const page=source?.pages.includes(position.page||0)?position.page!:source?.pages[0]||1;
  return <aside className="pixel-panel source-comparison" aria-label="对照原文"><header><h2>对照原文</h2><button onClick={onClose} aria-label="收起原文">×</button></header>{sources.length>1?<select aria-label="选择原资料" value={source.bookId} onChange={e=>onPosition({bookId:e.target.value,page:sources.find(s=>s.bookId===e.target.value)!.pages[0],view:'text'})}>{sources.map(s=><option value={s.bookId} key={s.bookId}>{s.name}</option>)}</select>:<p className="source-name">{source?.name||material.title}</p>}{source&&<div className="source-page-nav"><button aria-label="上一引用页" disabled={page===source.pages[0]} onClick={()=>onPosition({bookId:source.bookId,page:source.pages[source.pages.indexOf(page)-1]})}>←</button><label>本课引用范围<select aria-label="选择引用页或文本段" value={page} onChange={e=>onPosition({bookId:source.bookId,page:Number(e.target.value)})}>{source.pages.map(p=><option key={p} value={p}>{source.kind==='text'?'文本段':'PDF 第'} {p}{source.kind==='text'?'':' 页'}</option>)}</select></label><button aria-label="下一引用页" disabled={page===source.pages.at(-1)} onClick={()=>onPosition({bookId:source.bookId,page:source.pages[source.pages.indexOf(page)+1]})}>→</button></div>}<SourcePage key={source?.bookId||material.id} source={source} page={page} material={material} lessonId={lessonId} teaching={teaching} view={position.view||'text'} onView={view=>onPosition({view})} onConfigure={onConfigure}/></aside>
 }
